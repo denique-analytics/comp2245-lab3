@@ -81,6 +81,70 @@ function BuildBoard() {
 
 
 
+ // ********************** Exercise 2 · Turn a card over ***********************
+
+
+// Listen for clicks on the board
+
+
+const board = document.querySelector("#board");
+
+board.addEventListener("click", (event) => {
+  const card = event.target;
+
+
+
+
+  // Only respond when a card is clicked
+
+  if (!card.classList.contains("card")) {
+    return;
+  }
+
+
+
+
+
+  // Ignore cards that are already face up
+
+  if (card.classList.contains("flipped")) {
+    return;
+  }
+
+
+
+
+// Find the fruit belonging to this card
+
+
+const fruit = deck[card.dataset.index];
+
+
+
+// Display the fruit symbol
+
+card.textContent = fruit.symbol;
+
+
+// Turn the card face up
+
+card.classList.add("flipped");
+
+
+// Remember this face-up card
+
+flippedCards.push(card);
+
+
+// Update the screen-reader label
+
+
+card.setAttribute(
+  "aria-label",
+  `Card ${Number(card.dataset.index) + 1}, ${fruit.name}`
+);
+
+});
 
 // Calling the function again 
 
