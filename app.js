@@ -1,7 +1,6 @@
- // ********************** Exercise 1 · Build a shuffled board ***********************
+// Exercise 1: Build a shuffled board
 
-// List of fruits used in the memory game
-
+// The fruits used in the game
 const fruits = [
   { name: "apple", symbol: "🍎" },
   { name: "banana", symbol: "🍌" },
@@ -13,12 +12,7 @@ const fruits = [
   { name: "watermelon", symbol: "🍉" },
 ];
 
-
-
-
-// Randomly shuffles the cards
-
-
+// Shuffle the cards
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -28,44 +22,19 @@ function shuffle(array) {
   return array;
 }
 
-
-
-
-// Store the deck and the cards turned face up
-
-
+// Keep track of the cards and moves
 let deck = [];
 const flippedCards = [];
+let moveCount = 0;
+let isWaiting = false;
 
-
-
-
-// Build the game board
-
-
-
-function BuildBoard() {
-
-
-  // Create and shuffle a deck containing 16 cards
-
-
+// Create the game board
+function buildBoard() {
   deck = shuffle([...fruits, ...fruits]);
-
-
-
-
-// Find the space where the cards will go
-
 
   const board = document.querySelector("#board");
 
-
-
-
-  // Create one button for each card in the deck
-
-
+  // Add each card to the board
   deck.forEach((fruit, i) => {
     const card = document.createElement("button");
 
@@ -76,77 +45,98 @@ function BuildBoard() {
 
     board.appendChild(card);
   });
-
 }
 
-
-
- // ********************** Exercise 2 · Turn a card over ***********************
-
-
-// Listen for clicks on the board
-
+// Exercise 2: Turn a card over
 
 const board = document.querySelector("#board");
+const movesDisplay = document.querySelector("#moves");
+const statusMessage = document.querySelector("#status");
 
+// Turn mismatched cards face down
+function turnCardsBack() {
+  flippedCards.forEach((card) => {
+    card.textContent = "";
+    card.classList.remove("flipped");
+
+    card.setAttribute(
+      "aria-label",
+      `Card ${Number(card.dataset.index) + 1}, face down`
+    );
+  });
+
+  // Clear the selected cards
+  flippedCards.length = 0;
+  isWaiting = false;
+}
+
+// Handle clicks on the board
 board.addEventListener("click", (event) => {
   const card = event.target;
 
+  // Ignore clicks while waiting
+  if (isWaiting) {
+    return;
+  }
 
-
-
-  // Only respond when a card is clicked
-
+  // Only respond to card clicks
   if (!card.classList.contains("card")) {
     return;
   }
 
-
-
-
-
   // Ignore cards that are already face up
-
   if (card.classList.contains("flipped")) {
     return;
   }
 
+  // Find and show the fruit
+  const fruit = deck[card.dataset.index];
+  card.textContent = fruit.symbol;
+  card.classList.add("flipped");
 
+  // Remember the selected card
+  flippedCards.push(card);
 
+  // Update the card's accessibility label
+  card.setAttribute(
+    "aria-label",
+    `Card ${Number(card.dataset.index) + 1}, ${fruit.name}`
+  );
 
-// Find the fruit belonging to this card
+  // Check when two cards have been selected
+  if (flippedCards.length === 2) {
+    moveCount++;
+    movesDisplay.textContent = moveCount;
 
+    const firstFruit = deck[flippedCards[0].dataset.index];
+    const secondFruit = deck[flippedCards[1].dataset.index];
 
-const fruit = deck[card.dataset.index];
+    // Check whether the cards match
+    if (firstFruit.name === secondFruit.name) {
+      flippedCards[0].classList.add("matched");
+      flippedCards[1].classList.add("matched");
 
+      flippedCards[0].disabled = true;
+      flippedCards[1].disabled = true;
 
+      statusMessage.textContent = "That's a pair!";
 
-// Display the fruit symbol
+      // Clear the selected cards
+      flippedCards.length = 0;
+    } else {
+      // Give the player time to see the cards
+      statusMessage.textContent = "Not a pair. Try again.";
+      isWaiting = true;
 
-card.textContent = fruit.symbol;
-
-
-// Turn the card face up
-
-card.classList.add("flipped");
-
-
-// Remember this face-up card
-
-flippedCards.push(card);
-
-
-// Update the screen-reader label
-
-
-card.setAttribute(
-  "aria-label",
-  `Card ${Number(card.dataset.index) + 1}, ${fruit.name}`
-);
-
+      // Turn the cards back after one second
+      setTimeout(turnCardsBack, 1000);
+    }
+  }
 });
 
-// Calling the function again 
+// Exercise 3: Compare two cards
+// Exercise 4: Turn mismatched cards back over
 
-BuildBoard();
+buildBoard();
+
 
