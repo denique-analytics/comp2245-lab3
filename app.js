@@ -27,8 +27,9 @@ function shuffle(array) {
 // Keep track of the cards and moves
 let deck = [];
 const flippedCards = [];
-let moveCount = 0;
-let isWaiting = false;
+let moveCount = 0; // Keep count of the moves
+let isWaiting = false; // Keep the cards facing down until the right answer 
+let mismatchTimer = null; // Keep track of the timer
 
 // Create the game board
 function buildBoard() {
@@ -48,6 +49,7 @@ function buildBoard() {
 
     board.appendChild(card);
 
+
   });
 
 }
@@ -58,6 +60,31 @@ const board = document.querySelector("#board");
 const movesDisplay = document.querySelector("#moves");
 const statusMessage = document.querySelector("#status");
 
+// Exercise 6: Start a new game
+
+function startNewGame() {
+
+   // Cancel any pending timer
+   clearTimeout(mismatchTimer);
+   mismatchTimer = null;
+
+  // Reset the game state
+   isWaiting = false;
+   flippedCards.length = 0;
+   moveCount = 0;
+   movesDisplay.textContent = moveCount;
+
+  // Reset the status message
+   statusMessage.textContent = "Turn over two cards to find a matching pair.";
+   statusMessage.classList.remove("you-won");
+
+  // Remove the old cards
+   board.replaceChildren();
+
+  // Build a new shuffled board
+   buildBoard();
+
+}
 // Exercise 5: Finish the game
 
 // Check whether all cards have been matched
@@ -165,14 +192,22 @@ board.addEventListener("click", (event) => {
       statusMessage.textContent = "Not a pair. Try again.";
       isWaiting = true;
 
+     // Exercise 6 · Start a new game
+
       // Turn the cards back after one second
-      setTimeout(turnCardsBack, 1000);
+      mismatchTimer = setTimeout(turnCardsBack, 1000);
 
     }
 
   }
 
 });
+
+// Start a new game when the button is clicked
+
+const newGameButton = document.querySelector("#new-game");
+
+newGameButton.addEventListener("click", startNewGame);
 
 
 buildBoard();
