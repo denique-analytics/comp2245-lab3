@@ -1,3 +1,15 @@
 # COMP2245 Lab 3
 
-This is Lab 3 for Denique Whyte. 
+
+
+This is Lab 3 for Denique Whyte.
+
+
+
+Browsers Tested
+
+
+
+* Microsoft Edge 
+* Opera 
+
